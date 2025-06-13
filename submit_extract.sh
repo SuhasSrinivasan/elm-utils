@@ -15,7 +15,7 @@ TIME="$2"
 # === Submit the job ===
 sbatch \
   --job-name=extract_${USERNAME} \
-  -o ${USERNAME}.out \
-  -e ${USERNAME}.err \
+  -o extract_${USERNAME}.out \
+  -e extract_${USERNAME}.err \
   --time=${TIME} \
   extract_tar.sh ${USERNAME}
