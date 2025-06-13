@@ -18,4 +18,4 @@ sbatch \
   -o extract_${USERNAME}.out \
   -e extract_${USERNAME}.err \
   --time=${TIME} \
-  extract_tar.sh ${USERNAME}
+  extract_tar.sbatch ${USERNAME}
