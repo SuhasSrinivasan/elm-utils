@@ -6,12 +6,12 @@
 #SBATCH -o extract_tar.out           # Default output file
 #SBATCH -e extract_tar.err           # Default error file
 #SBATCH --time=2-00:00               # Default wall time, 2 days
-#SBATCH --partition=                 # Change this to your partition
+#SBATCH --partition=                 # Add your partition
 #SBATCH -C CLASS:SH3_CBASE.1         # Change this to your fastest node type
 #SBATCH --cpus-per-task=8            # Change this as needed
 #SBATCH --mem=64GB                   # Change this as needed
 #SBATCH --mail-type=FAIL,END         # Helps to receive email notifications
-#SBATCH --mail-user=                 # Add email address for notifications
+#SBATCH --mail-user=                 # Add your email address
 
 
 # === Check for username argument ===
