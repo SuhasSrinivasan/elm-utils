@@ -29,22 +29,22 @@ ml mpifileutils
 
 # === Go to user's directory ===
 cd "$USERDIR" || {
-  echo "Directory $USERDIR not found!"
+  echo "[ERROR] Directory not found: $USERDIR"
   exit 2
 }
 
-echo "[DEBUG] Current directory: $(pwd)"
+echo "[INFO] Current directory: $(pwd)"
 
 # === Loop through each split tar file ===
 for f in ${USERNAME}_0*.tar; do
-  echo "[INFO] Processing $f..."
+  echo "[INFO] Processing: $f..."
   srun -n 16 dtar -x -f "$f"
   
   if [ $? -ne 0 ]; then
-    echo "[ERROR] dtar failed on $f. Exiting."
+    echo "[ERROR] dtar failed on: $f. Exiting."
     exit 3
   else
-    echo "[INFO] Successfully extracted $f. Removing..."
+    echo "[INFO] Successfully extracted: $f. Removing..."
     rm -f "$f"
   fi
 done
