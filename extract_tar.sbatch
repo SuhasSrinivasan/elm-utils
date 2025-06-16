@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to concatenate, extract and delete tar files downloaded from Elm
+# Script to extract and delete tar files downloaded from Elm
 # Use the helper script submit_extract.sh
 
 #SBATCH -J extract_tar               		# Default job name
