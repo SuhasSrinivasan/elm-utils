@@ -13,7 +13,6 @@
 #SBATCH --mail-type=FAIL,END         		# Helps to receive email notifications
 #SBATCH --mail-user=                    # Add your email address
 
-
 # === Check for username argument ===
 if [ -z "$1" ]; then
   echo "Usage: sbatch [options] $0 <username>"
@@ -27,7 +26,6 @@ USERDIR="/oak/stanford/groups/howchang/users/${USERNAME}/"
 ml system
 ml mpifileutils
 
-# === Go to user's directory ===
 cd "$USERDIR" || {
   echo "[ERROR] Directory not found: $USERDIR"
   exit 2
@@ -35,19 +33,37 @@ cd "$USERDIR" || {
 
 echo "[INFO] Current directory: $(pwd)"
 
-# === Loop through each split tar file ===
-for f in ${USERNAME}_0*.tar; do
-  echo "[INFO] Processing: $f..."
+# === Find and sort all split tar files ===
+tar_files=( $(ls ${USERNAME}_0*.tar | sort) )
+num_files=${#tar_files[@]}
+
+if (( num_files == 0 )); then
+  echo "[ERROR] No tar files found."
+  exit 4
+fi
+
+# === Extract all but the last with dtar ===
+# This avoids the .dtaridx index file issue which is stored in the last split
+for ((i=0; i<num_files-1; i++)); do
+  f="${tar_files[i]}"
+  echo "[INFO] Extracting with dtar: $f"
   srun -n 16 dtar -x -f "$f"
-  
   if [ $? -ne 0 ]; then
-    echo "[ERROR] dtar failed on: $f. Exiting."
-    exit 3
-  else
-    echo "[INFO] Successfully extracted: $f. Removing..."
-    rm -f "$f"
+    echo "[ERROR] dtar failed on: $f"
+    exit 5
   fi
 done
 
-echo "[INFO] All archives processed successfully."
+# === Extract the last tar file with tar ===
+last_file="${tar_files[num_files-1]}"
+echo "[INFO] Extracting last split with tar: $last_file"
+tar -xf "$last_file"
+if [ $? -ne 0 ]; then
+  echo "[ERROR] tar failed on: $last_file"
+  exit 6
+fi
 
+# === All extractions successful; delete files ===
+echo "[INFO] All extractions successful. Deleting all tar files..."
+rm -f "${tar_files[@]}"
+echo "[INFO] All split tar files deleted."
