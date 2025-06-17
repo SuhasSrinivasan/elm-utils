@@ -42,7 +42,7 @@ if (( num_files == 0 )); then
   exit 4
 fi
 
-echo "[INFO] Found $num_files tar files: ${tar_files[*]}"
+echo "[INFO] Found $num_files tar files"
 
 # === Extract with tar ===
 if [ "$TOOL" = "tar" ]; then
