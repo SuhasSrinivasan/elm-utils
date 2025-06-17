@@ -34,16 +34,18 @@ cd "$USERDIR" || {
 echo "[INFO] Current directory: $(pwd)"
 
 # === Find and sort all split tar files ===
-tar_files=( $(ls ${USERNAME}_0*.tar | sort) )
+tar_files=( $(ls ${USERNAME}_0*.tar 2>/dev/null | sort) )
 num_files=${#tar_files[@]}
 
 if (( num_files == 0 )); then
-  echo "[ERROR] No tar files found."
+  echo "[ERROR] No tar files found matching pattern: ${USERNAME}_0*.tar"
   exit 4
 fi
 
+echo "[INFO] Found $num_files tar files: ${tar_files[*]}"
+
 # === Extract with tar ===
-if [ "$TOOL" = "tar" ] ; then
+if [ "$TOOL" = "tar" ]; then
 
   for ((i=0; i<num_files; i++)); do
     f="${tar_files[i]}"
@@ -57,7 +59,7 @@ if [ "$TOOL" = "tar" ] ; then
   STATUS="complete"
 
 # === Extract with dtar ===
-elif [ "$TOOL" = "dtar" ] ; then 
+elif [ "$TOOL" = "dtar" ]; then 
 
   for ((i=0; i<num_files-1; i++)); do
     f="${tar_files[i]}"
@@ -82,11 +84,11 @@ elif [ "$TOOL" = "dtar" ] ; then
 
 else
   echo "[ERROR] Invalid tool specified: $TOOL. Use 'tar' or 'dtar'"
-  exit 7
+  exit 3
 fi
 
 # === If all extractions successful delete files ===
-if [ "$STATUS" = "complete" ] ; then
+if [ "$STATUS" = "complete" ]; then
   echo "[INFO] All extractions successful. Deleting all tar files..."
   rm -f "${tar_files[@]}"
   echo "[INFO] All split tar files deleted."
