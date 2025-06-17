@@ -73,3 +73,80 @@ if [ $BLOCK_COUNT -gt 0 ]; then
     [ -n "$filepath" ] && echo "[UNSUPPORTED TYPE][block dev] $filepath" >> "$LOG_FILE"
   done < block_dev.txt
 fi
+
+# Process character device files
+if [ $CHAR_COUNT -gt 0 ]; then
+  while IFS= read -r filepath; do
+    [ -n "$filepath" ] && echo "[UNSUPPORTED TYPE][char dev] $filepath" >> "$LOG_FILE"
+  done < char_dev.txt
+fi
+
+# Process FIFO files
+if [ $PIPE_COUNT -gt 0 ]; then
+  while IFS= read -r filepath; do
+    [ -n "$filepath" ] && echo "[UNSUPPORTED TYPE][pipe] $filepath" >> "$LOG_FILE"
+  done < pipes.txt
+fi
+
+# Process socket files
+if [ $SOCKET_COUNT -gt 0 ]; then
+  while IFS= read -r filepath; do
+    [ -n "$filepath" ] && echo "[UNSUPPORTED TYPE][socket] $filepath" >> "$LOG_FILE"
+  done < sockets.txt
+fi
+
+SPECIAL_COUNT=$((BLOCK_COUNT + CHAR_COUNT + PIPE_COUNT + SOCKET_COUNT))
+
+echo "[INFO] Found $SPECIAL_COUNT special files"
+
+echo "[INFO] Processing permission issues from dwalk output..."
+
+# Process the dwalk text output for permission issues
+awk -v cur_user="$CURR_USER" '
+function log_issue(tag, msg) {
+  print tag " " msg >> "'"$LOG_FILE"'"
+  perm_count++
+}
+
+BEGIN { perm_count = 0 }
+
+{
+  if (NF < 6) next  # Skip lines that do not have enough fields
+
+  perms = $1
+  user = $2
+  group = $3
+  # Path is the last field
+  path = $NF
+
+  # Skip if invalid
+  if (path == "" || perms == "" || user == "" || group == "") next
+
+  # Check if this is a directory (starts with d)
+  is_directory = (substr(perms, 1, 1) == "d")
+
+  # Permission checking - only for current user
+  u_read = (substr(perms, 2, 1) == "r")
+  u_exec = (substr(perms, 4, 1) == "x")
+
+  # Only check if the file/directory is owned by current user
+  if (user == cur_user) {
+    has_read = u_read
+    has_exec = is_directory ? u_exec : 1
+
+    if (!has_read || (!has_exec && is_directory)) {
+      issue = " ["
+      if (!has_read) issue = issue "NO_READ "
+      if (!has_exec && is_directory) issue = issue "NO_EXEC "
+      issue = issue "]"
+      issue = issue path
+      log_issue("[NO_ACCESS]", issue)
+    }
+  }
+}
+
+END {
+  print "[SUMMARY] Permission issues found: " perm_count >> "'"$LOG_FILE"'"
+}
+' "$DWALK_TXT"
+
