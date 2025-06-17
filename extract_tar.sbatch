@@ -56,6 +56,7 @@ if [ "$TOOL" = "tar" ]; then
     f="${tar_files[i]}"
     echo "[INFO] Extracting with tar: $f"
     tar -x -f "$f"
+    echo "[INFO] Extracted: ($((i+1))/$num_files)"
     if [ $? -ne 0 ]; then
       echo "[ERROR] tar failed on: $f"
       exit 5
@@ -70,6 +71,7 @@ elif [ "$TOOL" = "dtar" ]; then
     f="${tar_files[i]}"
     echo "[INFO] Extracting with dtar: $f"
     srun -n "$NTASKS" dtar -x -f "$f"
+    echo "[INFO] Extracted: ($((i+1))/$num_files)"
     if [ $? -ne 0 ]; then
       echo "[ERROR] dtar failed on: $f"
       exit 5
