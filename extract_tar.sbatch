@@ -79,6 +79,8 @@ elif [ "$TOOL" = "dtar" ]; then
       echo "[ERROR] tar failed on: $f"
       exit 5
     fi
+    STATUS="complete"
+
   else
     # Extract all but the last file with dtar
     echo "[INFO] Extracting $((num_files-1)) files with dtar, last file with tar"
@@ -102,8 +104,9 @@ elif [ "$TOOL" = "dtar" ]; then
       echo "[ERROR] tar failed on: $last_file"
       exit 6
     fi
+    STATUS="complete"
   fi
-  STATUS="complete"
+
 fi
 
 # === If all extractions successful delete files ===
