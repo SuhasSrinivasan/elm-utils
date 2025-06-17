@@ -19,6 +19,7 @@ fi
 USERNAME="$1"
 TOOL="$2"
 NTASKS="$3"
+STATUS="incomplete"
 USERDIR="/oak/stanford/groups/howchang/users/${USERNAME}/"
 
 # === Load required modules ===
@@ -41,28 +42,49 @@ if (( num_files == 0 )); then
   exit 4
 fi
 
-# === Extract all but the last with dtar ===
-# This avoids the .dtaridx index file issue which is stored in the last split
-for ((i=0; i<num_files-1; i++)); do
-  f="${tar_files[i]}"
-  echo "[INFO] Extracting with dtar: $f"
-  srun -n 16 dtar -x -f "$f"
-  if [ $? -ne 0 ]; then
-    echo "[ERROR] dtar failed on: $f"
-    exit 5
-  fi
-done
+# === Extract with tar ===
+if [ "$TOOL" = "tar" ] ; then
 
-# === Extract the last tar file with tar ===
-last_file="${tar_files[num_files-1]}"
-echo "[INFO] Extracting last split with tar: $last_file"
-tar -xf "$last_file"
-if [ $? -ne 0 ]; then
-  echo "[ERROR] tar failed on: $last_file"
-  exit 6
+  for ((i=0; i<num_files; i++)); do
+    f="${tar_files[i]}"
+    echo "[INFO] Extracting with tar: $f"
+    tar -x -f "$f"
+    if [ $? -ne 0 ]; then
+      echo "[ERROR] tar failed on: $f"
+      exit 5
+    fi
+  done
+  STATUS="complete"
+
+# === Extract with dtar ===
+elif [ "$TOOL" = "dtar" ] ; then 
+
+  for ((i=0; i<num_files-1; i++)); do
+    f="${tar_files[i]}"
+    echo "[INFO] Extracting with dtar: $f"
+    srun -n "$NTASKS" dtar -x -f "$f"
+    if [ $? -ne 0 ]; then
+      echo "[ERROR] dtar failed on: $f"
+      exit 5
+    fi
+  done
+
+  # Extract the last tar file with tar
+  # This avoids the .dtaridx index file issue which is stored in the last split
+  last_file="${tar_files[num_files-1]}"
+  echo "[INFO] Extracting last split with tar: $last_file"
+  tar -xf "$last_file"
+  if [ $? -ne 0 ]; then
+    echo "[ERROR] tar failed on: $last_file"
+    exit 6
+  fi
+  STATUS="complete"
+
 fi
 
-# === All extractions successful; delete files ===
-echo "[INFO] All extractions successful. Deleting all tar files..."
-rm -f "${tar_files[@]}"
-echo "[INFO] All split tar files deleted."
+# === If all extractions successful delete files ===
+if [ "$STATUS" = "complete" ] ; then
+  echo "[INFO] All extractions successful. Deleting all tar files..."
+  rm -f "${tar_files[@]}"
+  echo "[INFO] All split tar files deleted."
+fi
