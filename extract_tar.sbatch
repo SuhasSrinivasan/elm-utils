@@ -5,13 +5,10 @@
 #SBATCH -J extract_tar               		# Default job name
 #SBATCH -o extract_tar.out           		# Default output file
 #SBATCH -e extract_tar.err           		# Default error file
-#SBATCH --time=2-00:00               		# Default wall time, 2 days
-#SBATCH --partition=                    # Add your partition
-#SBATCH -C CLASS:SH3_CBASE.1         		# Change this to your fastest node type
-#SBATCH --ntasks=16 							        # Change this as needed
-#SBATCH --mem=128GB                   		# Change this as needed
 #SBATCH --mail-type=FAIL,END         		# Helps to receive email notifications
+#SBATCH -C CLASS:SH3_CBASE.1         		# Change this to your fastest node type
 #SBATCH --mail-user=                    # Add your email address
+#SBATCH --partition=                    # Add your partition
 
 # === Check for username argument ===
 if [ -z "$2" ]; then
