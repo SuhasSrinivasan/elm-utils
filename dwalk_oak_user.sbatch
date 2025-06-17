@@ -150,3 +150,29 @@ END {
 }
 ' "$DWALK_TXT"
 
+# Final summary
+PERM_ISSUES=$(grep -c "^\[NO_ACCESS\]" "$LOG_FILE" 2>/dev/null || echo "0")
+
+# Safety checks to ensure variables are numeric
+if [[ ! "$SPECIAL_COUNT" =~ ^[0-9]+$ ]]; then
+  SPECIAL_COUNT=0
+fi
+
+if [[ ! "$PERM_ISSUES" =~ ^[0-9]+$ ]]; then
+  PERM_ISSUES=0
+fi
+
+TOTAL_ISSUES=$((SPECIAL_COUNT + PERM_ISSUES))
+
+echo "[SUMMARY] Total issues found: $TOTAL_ISSUES" | tee -a "$LOG_FILE"
+echo "  - Special files: $SPECIAL_COUNT" | tee -a "$LOG_FILE"
+echo "  - Permission issues: $PERM_ISSUES" | tee -a "$LOG_FILE"
+
+# Cleanup
+rm -f block_dev.txt
+rm -f char_dev.txt
+rm -f pipes.txt
+rm -f sockets.txt
+
+echo "[INFO] Scan complete. Issues logged to: $LOG_FILE"
+echo "Process ended at: [$(date '+%Y-%m-%d %H:%M:%S')]"
