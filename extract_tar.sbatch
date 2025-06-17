@@ -31,6 +31,7 @@ cd "$USERDIR" || {
   exit 2
 }
 
+# === Validate tool parameter ===
 if [ "$TOOL" != "tar" ] && [ "$TOOL" != "dtar" ]; then
   echo "[ERROR] Invalid tool: $TOOL. Must be 'tar' or 'dtar'"
   exit 3
@@ -51,12 +52,12 @@ echo "[INFO] Found $num_files tar files"
 
 # === Extract with tar ===
 if [ "$TOOL" = "tar" ]; then
-
+  echo "[INFO] Starting extraction with tar..."
+  
   for ((i=0; i<num_files; i++)); do
     f="${tar_files[i]}"
-    echo "[INFO] Extracting with tar: $f"
+    echo "[INFO] Extracting with tar ($((i+1))/$num_files): $f"
     tar -x -f "$f"
-    echo "[INFO] Extracted: ($((i+1))/$num_files)"
     if [ $? -ne 0 ]; then
       echo "[ERROR] tar failed on: $f"
       exit 5
@@ -65,35 +66,53 @@ if [ "$TOOL" = "tar" ]; then
   STATUS="complete"
 
 # === Extract with dtar ===
-elif [ "$TOOL" = "dtar" ]; then 
-
-  for ((i=0; i<num_files-1; i++)); do
-    f="${tar_files[i]}"
-    echo "[INFO] Extracting with dtar: $f"
-    srun -n "$NTASKS" dtar -x -f "$f"
-    echo "[INFO] Extracted: ($((i+1))/$num_files)"
+elif [ "$TOOL" = "dtar" ]; then
+  echo "[INFO] Starting extraction with dtar..."
+  
+  # Handle edge case: only one file
+  if [ "$num_files" -eq 1 ]; then
+    echo "[INFO] Only one file found, using tar instead of dtar"
+    f="${tar_files[0]}"
+    echo "[INFO] Extracting with tar (1/1): $f"
+    tar -xf "$f"
     if [ $? -ne 0 ]; then
-      echo "[ERROR] dtar failed on: $f"
+      echo "[ERROR] tar failed on: $f"
       exit 5
     fi
-  done
+  else
+    # Extract all but the last file with dtar
+    echo "[INFO] Extracting $((num_files-1)) files with dtar, last file with tar"
+    
+    for ((i=0; i<num_files-1; i++)); do
+      f="${tar_files[i]}"
+      echo "[INFO] Extracting with dtar ($((i+1))/$((num_files-1))): $f"
+      srun -n "$NTASKS" dtar -x -f "$f"
+      if [ $? -ne 0 ]; then
+        echo "[ERROR] dtar failed on: $f"
+        exit 5
+      fi
+    done
 
-  # Extract the last tar file with tar
-  # This avoids the .dtaridx index file issue which is stored in the last split
-  last_file="${tar_files[num_files-1]}"
-  echo "[INFO] Extracting last split with tar: $last_file"
-  tar -xf "$last_file"
-  if [ $? -ne 0 ]; then
-    echo "[ERROR] tar failed on: $last_file"
-    exit 6
+    # Extract the last tar file with tar
+    # This avoids the .dtaridx index file issue which is stored in the last split
+    last_file="${tar_files[num_files-1]}"
+    echo "[INFO] Extracting last split with tar ($num_files/$num_files): $last_file"
+    tar -xf "$last_file"
+    if [ $? -ne 0 ]; then
+      echo "[ERROR] tar failed on: $last_file"
+      exit 6
+    fi
   fi
   STATUS="complete"
-
 fi
 
 # === If all extractions successful delete files ===
 if [ "$STATUS" = "complete" ]; then
   echo "[INFO] All extractions successful. Deleting all tar files..."
   rm -f "${tar_files[@]}"
-  echo "[INFO] All split tar files deleted."
+  echo "[INFO] All $num_files split tar files deleted."
+  echo "[INFO] Extraction and cleanup completed successfully!"
+else
+  echo "[ERROR] Extraction not completed. Files not deleted."
+  exit 7
 fi
