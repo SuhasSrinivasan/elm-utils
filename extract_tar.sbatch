@@ -14,12 +14,14 @@
 #SBATCH --mail-user=                    # Add your email address
 
 # === Check for username argument ===
-if [ -z "$1" ]; then
-  echo "Usage: sbatch [options] $0 <username>"
+if [ -z "$2" ]; then
+  echo "Usage: sbatch [options] $0 <username> <tool:dtar/tar>"
+  echo "Example: sbatch $0 user dtar
   exit 1
 fi
 
 USERNAME="$1"
+TOOL="$2"
 USERDIR="/oak/stanford/groups/howchang/users/${USERNAME}/"
 
 # === Load required modules ===
