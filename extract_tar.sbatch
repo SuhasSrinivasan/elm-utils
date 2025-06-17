@@ -31,6 +31,11 @@ cd "$USERDIR" || {
   exit 2
 }
 
+if [ "$TOOL" != "tar" ] && [ "$TOOL" != "dtar" ]; then
+  echo "[ERROR] Invalid tool: $TOOL. Must be 'tar' or 'dtar'"
+  exit 3
+fi
+
 echo "[INFO] Current directory: $(pwd)"
 
 # === Find and sort all split tar files ===
@@ -82,9 +87,6 @@ elif [ "$TOOL" = "dtar" ]; then
   fi
   STATUS="complete"
 
-else
-  echo "[ERROR] Invalid tool specified: $TOOL. Use 'tar' or 'dtar'"
-  exit 3
 fi
 
 # === If all extractions successful delete files ===
