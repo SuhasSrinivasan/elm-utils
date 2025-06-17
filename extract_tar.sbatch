@@ -80,6 +80,9 @@ elif [ "$TOOL" = "dtar" ] ; then
   fi
   STATUS="complete"
 
+else
+  echo "[ERROR] Invalid tool specified: $TOOL. Use 'tar' or 'dtar'"
+  exit 7
 fi
 
 # === If all extractions successful delete files ===
