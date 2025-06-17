@@ -10,15 +10,15 @@
 #SBATCH --mail-user=                    # Add your email address
 #SBATCH --partition=                    # Add your partition
 
-# === Check for username argument ===
-if [ -z "$2" ]; then
-  echo "Usage: sbatch [options] $0 <username> <tool:dtar/tar>"
-  echo "Example: sbatch $0 user dtar
+# === Check for arguments ===
+if [ -z "$3" ]; then
+  echo "Usage: sbatch [options] $0 <username> <tool:dtar/tar> <ntasks>"
   exit 1
 fi
 
 USERNAME="$1"
 TOOL="$2"
+NTASKS="$3"
 USERDIR="/oak/stanford/groups/howchang/users/${USERNAME}/"
 
 # === Load required modules ===
