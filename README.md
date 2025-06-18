@@ -6,3 +6,5 @@ Utility scripts to help prepare data for [Elm](https://uit.stanford.edu/service/
 2. **parse_errors.sh**: Can be used to parse errors and extract paths from `dwalk_oak_user.sbatch` or the `elm_archive` tool.
 3. **delete_files.sh**: Review paths identified by `parse_errors.sh` and pass to this script to delete the unsupported files.
 4. **submit_extract.sh**: To extract files downloaded from Elm using `tar` or `dtar`. This is a helper script to run `extract_tar.sbatch`.
+
+Elm documentation: https://docs.elm.stanford.edu/ 
