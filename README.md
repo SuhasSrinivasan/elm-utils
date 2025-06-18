@@ -8,3 +8,4 @@ Utility scripts to help prepare data for [Elm](https://uit.stanford.edu/service/
 4. **submit_extract.sh**: To extract files downloaded from Elm using `tar` or `dtar`. This is a helper script to run `extract_tar.sbatch`.
 
 Elm documentation: https://docs.elm.stanford.edu/ 
+Thanks to the amazing team at Stanford Research Computing for developing Elm!
