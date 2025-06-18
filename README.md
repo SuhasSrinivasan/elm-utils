@@ -1,5 +1,5 @@
 
-Utility scripts to help prepare data for Elm upload and extract data retrieved from Elm.
+Utility scripts to help prepare data for [Elm](https://uit.stanford.edu/service/elm-storage) upload and extract data retrieved from Elm.
 
 ### Intended sequence of script usage
 1. **dwalk_oak_user.sbatch**: To find and log special files that are unsupported by `tar` and `dtar`, and paths that lack read permissions by the user performing archival (helpful for group admins).
