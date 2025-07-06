@@ -1,0 +1,3 @@
+This text file should contain the Oak user directories to be deleted
+userA
+userB
