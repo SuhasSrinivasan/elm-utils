@@ -1,6 +1,6 @@
-Hello!
+Hello interested user!
 
-Utility scripts to assist with the following operations related to [Elm](https://uit.stanford.edu/service/elm-storage) archival:
+The repository contains utility scripts to assist with the following operations related to [Elm](https://uit.stanford.edu/service/elm-storage) archival:
 1. Check if files and permissions are supported for upload and handle issues
 2. Extract data retrieved from Elm
 3. Delete archived data from Oak
