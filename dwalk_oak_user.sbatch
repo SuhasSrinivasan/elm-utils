@@ -7,6 +7,7 @@
 #SBATCH -e dwalk_user.err                       # Default error file
 #SBATCH --time=0-1:00:00                        # Default wall time, 1 hour
 #SBATCH --ntasks=8                              # Change this as needed
+#SBATCH --cpus-per-task=4                       # Change this as needed and change NUM_PROCS
 #SBATCH --mail-type=FAIL,END                    # Helps to receive email notifications
 #SBATCH --mail-user=                            # Add your email address
 #SBATCH --partition=                            # Add your partition
